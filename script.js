@@ -20,11 +20,12 @@ const dateFormMaker = function () {
   //console.log(inputYear, inputMonth, inputDate);
 };
 
-const counterMaker = function () {
-  const targetDateInput = dateFormMaker();
-
+const counterMaker = function (data) {
+  if (data != savedTime) {
+    localStorage.setItem("savedTime", data);
+  }
   const nowDate = new Date();
-  const targetDate = new Date(targetDateInput).setHours(0, 0, 0, 0);
+  const targetDate = new Date(data).setHours(0, 0, 0, 0);
   const remaining = (targetDate - nowDate) / 1000;
 
   if (remaining <= 0) {
@@ -69,17 +70,18 @@ const counterMaker = function () {
 
 const starter = function (targetDateInput) {
   if (!targetDateInput) {
-    targetDateInput = dateFormMaker;
+    targetDateInput = dateFormMaker();
   }
 
   localStorage.setItem("savedTime", targetDateInput);
-  console.log(savedTime);
   container.style.display = "flex";
   messageContainer.style.display = "none";
-  counterMaker();
-  const intervalId = setInterval(counterMaker, 1000);
+  setClearInterval();
+  counterMaker(targetDateInput);
+  const intervalId = setInterval(() => {
+    counterMaker(targetDateInput);
+  }, 1000);
   intervalIdArr.push(intervalId);
-  console.log(intervalIdArr);
 };
 
 const setClearInterval = function () {
@@ -97,9 +99,8 @@ const resetTimer = function () {
 };
 
 if (savedTime) {
-  container.style.display = "flex";
-  counterMaker.dateFormMaker = savedTime;
-  counterMaker();
+  starter(savedTime);
 } else {
-  console.log("data is Null");
+  container.style.display = "none";
+  messageContainer.innerHTML = '<h3>"D-Day를 입력해 주세요.</h3>';
 }
